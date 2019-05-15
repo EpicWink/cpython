@@ -23,11 +23,11 @@ def main():
     parser.add_argument('infile', nargs='?',
                         type=argparse.FileType(encoding="utf-8"),
                         help='a JSON file to be validated or pretty-printed',
-                        default=sys.stdin)
+                        default='-')
     parser.add_argument('outfile', nargs='?',
                         type=argparse.FileType('w', encoding="utf-8"),
                         help='write the output of infile to outfile',
-                        default=sys.stdout)
+                        default='-')
     parser.add_argument('--sort-keys', action='store_true', default=False,
                         help='sort the output of dictionaries alphabetically by key')
     parser.add_argument('--json-lines', action='store_true', default=False,
@@ -54,6 +54,8 @@ def main():
         dump_args['indent'] = None
         dump_args['separators'] = ',', ':'
 
+    options.infile = sys.stdin if options.infile == '-' else options.infile
+    options.outfile = sys.stdout if options.outfile == '-' else options.outfile
     with options.infile as infile, options.outfile as outfile:
         try:
             if options.json_lines:
