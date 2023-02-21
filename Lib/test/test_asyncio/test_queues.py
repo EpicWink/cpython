@@ -528,9 +528,13 @@ class _QueueShutdownTestMixin:
     async def test_empty(self):
         q = self.q_class()
         q.shutdown()
-        with self.assertRaises(asyncio.QueueShutDown):
+        with self.assertRaises(
+            asyncio.QueueShutDown, msg="Didn't appear to shut-down queue"
+        ):
             await q.put("data")
-        with self.assertRaises(asyncio.QueueShutDown):
+        with self.assertRaises(
+            asyncio.QueueShutDown, msg="Didn't appear to shut-down queue"
+        ):
             await q.get()
 
     async def test_nonempty(self):
@@ -538,14 +542,18 @@ class _QueueShutdownTestMixin:
         q.put_nowait("data")
         q.shutdown()
         await q.get()
-        with self.assertRaises(asyncio.QueueShutDown):
+        with self.assertRaises(
+            asyncio.QueueShutDown, msg="Didn't appear to shut-down queue"
+        ):
             await q.get()
 
     async def test_immediate(self):
         q = self.q_class()
         q.put_nowait("data")
         q.shutdown(immediate=True)
-        with self.assertRaises(asyncio.QueueShutDown):
+        with self.assertRaises(
+            asyncio.QueueShutDown, msg="Didn't appear to shut-down queue"
+        ):
             await q.get()
 
     async def test_shutdown_repr(self):
