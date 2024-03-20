@@ -636,6 +636,28 @@ class BaseQueueTestMixin(BlockingTestMixin):
 
         self.assertEqual(results, [True]*len(thrds))
 
+    def test_shutdown_immediate_only_notifies_with_no_tasks(self):
+        def join():
+            nonlocal joined
+            q.join()
+            joined = True
+
+        q = self.type2test()
+        q.put(1)
+        q.put(1)
+
+        joined = False
+        join_thread = threading.Thread(target=join)
+        join_thread.start()
+
+        self.assertEqual(q.get(), 1)
+        q.shutdown(immediate=True)
+        self.assertEqual(joined, False)
+
+        q.task_done()
+        threading_helper.join_thread(join_thread, timeout=0.1)
+        self.assertEqual(joined, True)
+
 
 class QueueTest(BaseQueueTestMixin):
 
